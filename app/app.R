@@ -6,8 +6,7 @@ ui <- fluidPage(
   
   # Application title
   titlePanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins 
+sidebarLayout(
   sidebarPanel(
     sliderInput(inputId = "eruptionLength",
                 label = "Length of Eruption (minutes):",
@@ -33,9 +32,17 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
+  data <- reactive(
+    faithful %>%
+      filter(
+        between(eruptions, input$eruptionLength[1], input$eruptionLength[2])
+      )
+  )
+  
   output$distPlot <- renderPlot({
     # draw the histogram with the specified number of bins
-    faithful %>% ggplot(aes(x = waiting)) +
+
+    data() %>% ggplot(aes(x = waiting)) +
       geom_histogram(bins = input$bins, col = "white", fill = "darkgreen") +
       xlab("Waiting time (mins)") +
       ylab("Number of eruptions") +
